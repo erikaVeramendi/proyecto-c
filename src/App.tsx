@@ -426,7 +426,8 @@ export default function App() {
       {/* ── Navbar ── */}
       <nav className="navbar">
         <div className="nav-logo" onClick={() => setActiveSection('inicio')}>
-          <img src="/public/galeria/logo.png" alt="logo" className="logo-img" />
+          {/* ✅ CORREGIDO: /galeria/logo.png (sin /public/) */}
+          <img src="/galeria/logo.png" alt="logo" className="logo-img" />
         </div>
         <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
           <span /><span /><span />
@@ -480,7 +481,8 @@ export default function App() {
             <div className="hero-content">
               <div className="hero-logo-stage">
                 <div className="hero-logo-glow" />
-                <img src="/public/galeria/logo.png" alt="Carnicería Hermanos Gómez" className="hero-logo" />
+                {/* ✅ CORREGIDO: /galeria/logo.png (sin /public/) */}
+                <img src="/galeria/logo.png" alt="Carnicería Hermanos Gómez" className="hero-logo" />
               </div>
               <div className="hero-ornament">
                 <span className="orn-line" /><span className="orn-diamond">◆</span><span className="orn-line" />
@@ -516,7 +518,7 @@ export default function App() {
             <div className="stat"><span className="stat-num">★ 5.0</span><span className="stat-label">Valoración media</span></div>
           </section>
 
-          {/* CTA tienda — first (moved up) */}
+          {/* CTA tienda */}
           <section className="cta-tienda">
             <div className="cta-content">
               <h2>¿Listo para hacer tu pedido?</h2>
@@ -525,11 +527,12 @@ export default function App() {
             </div>
           </section>
 
-          {/* Historia snippet — after CTA (moved down) */}
+          {/* Historia snippet */}
           <section className="home-historia">
             <div className="historia-left">
               <div className="vintage-frame owner-frame">
-                <img src="/public/galeria/fotodueno.jpeg" alt="Eldueno" className="owner-real-img"
+                {/* ✅ CORREGIDO: /galeria/fotodueno.jpeg (sin /public/) */}
+                <img src="/galeria/fotodueno.jpeg" alt="Eldueno" className="owner-real-img"
                   onError={(e) => { const img = e.target as HTMLImageElement; img.style.display='none'; const next = img.nextElementSibling as HTMLElement; if(next) next.style.display='flex'; }} />
                 <div className="vintage-placeholder owner-placeholder" style={{display:'none'}}>
                   <span>📸</span><small>fotodueño.png</small>
@@ -604,15 +607,16 @@ export default function App() {
           <div className="historia-body">
             <div className="historia-timeline">
               {[
-                { year: 'Los Inicios', src: '/public/galeria/fotoantigua1.jpeg', text: 'Nuestra historia comienza hace varias décadas, cuando nuestros abuelos decidieron seguir la tradición de ofrecer carnes frescas y de calidad a su comunidad. Con apenas un mostrador y mucha ilusión, abrieron las puertas de lo que se convertiría en un referente de la ciudad.' },
-                { year: 'La Tradición', src: '/public/galeria/fotoantigua2.jpeg', text: 'Esa pasión por el buen corte de carne se fue transmitiendo de padres a hijos. Cada generación aportó su sello: nuevas técnicas, mejores cortes, mayor variedad. Pero siempre con la misma esencia: calidad y trato cercano al cliente.', right: true },
-                { year: 'Hoy', src: '/public/galeria/fotoantigua3.jpeg', text: 'Hoy somos una familia que sigue con orgullo el legado que nos dejaron. Cada pieza que ofrecemos tiene una historia detrás, forjada de generación en generación, siempre con el mismo objetivo: ofrecer lo mejor de la carne.' },
+                { year: 'Los Inicios', src: '/galeria/fotoantigua1.jpeg', text: 'Nuestra historia comienza hace varias décadas, cuando nuestros abuelos decidieron seguir la tradición de ofrecer carnes frescas y de calidad a su comunidad. Con apenas un mostrador y mucha ilusión, abrieron las puertas de lo que se convertiría en un referente de la ciudad.' },
+                { year: 'La Tradición', src: '/galeria/fotoantigua2.jpeg', text: 'Esa pasión por el buen corte de carne se fue transmitiendo de padres a hijos. Cada generación aportó su sello: nuevas técnicas, mejores cortes, mayor variedad. Pero siempre con la misma esencia: calidad y trato cercano al cliente.', right: true },
+                { year: 'Hoy', src: '/galeria/fotoantigua3.jpeg', text: 'Hoy somos una familia que sigue con orgullo el legado que nos dejaron. Cada pieza que ofrecemos tiene una historia detrás, forjada de generación en generación, siempre con el mismo objetivo: ofrecer lo mejor de la carne.' },
               ].map((item, i) => (
                 <div key={i} className={`timeline-item ${item.right ? 'right' : ''}`}>
                   <div className="timeline-year">{item.year}</div>
                   <div className="timeline-content">
                     <div className="vintage-frame small">
-                      <img src={`/public/galeria/${item.src}`} alt={item.year} className="frame-real-img"
+                      {/* ✅ CORREGIDO: src={item.src} que ya incluye /galeria/... */}
+                      <img src={item.src} alt={item.year} className="frame-real-img"
                         onError={(e) => { const img = e.target as HTMLImageElement; img.style.display='none'; const next = img.nextElementSibling as HTMLElement; if(next) next.style.display='flex'; }} />
                       <div className="vintage-placeholder" style={{display:'none'}}><span>🖼️</span><small>{item.src}</small></div>
                     </div>
@@ -623,7 +627,8 @@ export default function App() {
             </div>
             <div className="dueno-section">
               <div className="vintage-frame owner-frame large">
-                <img src="/public/galeria/fotodueno2.jpeg" alt="Eldueno" className="owner-real-img"
+                {/* ✅ CORREGIDO: /galeria/fotodueno2.jpeg (sin /public/) */}
+                <img src="/galeria/fotodueno2.jpeg" alt="Eldueno" className="owner-real-img"
                   onError={(e) => { const img = e.target as HTMLImageElement; img.style.display='none'; const next = img.nextElementSibling as HTMLElement; if(next) next.style.display='flex'; }} />
                 <div className="vintage-placeholder owner-placeholder large" style={{display:'none'}}><span>📸</span><small>fotodueño.png</small></div>
               </div>
@@ -706,21 +711,22 @@ export default function App() {
           </div>
           <div className="galeria-grid">
             {[
-              { src: '/public/galeria/fotoantigua1.jpeg', label: 'Foto Antigua 1', icon: '🖼️', tag: 'Historia', size: 'large' },
-              { src: '/public/galeria/fotoantigua2.jpeg', label: 'Foto Antigua 2', icon: '🖼️', tag: 'Historia', size: 'normal' },
-              { src: '/public/galeria/fotoantigua3.jpeg', label: 'Foto Antigua 3', icon: '🖼️', tag: 'Historia', size: 'normal' },
-              { src: '/public/galeria/local0.jpeg',   label: 'El Dueño',        icon: '👨‍🍳', tag: 'Equipo', size: 'normal' },
-              { src: '/public/galeria/local1.jpeg',      label: 'El Local 1',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local2.jpeg',      label: 'El Local 2',      icon: '🏪', tag: 'Instalaciones', size: 'large' },
-              { src: '/public/galeria/local3.jpeg',      label: 'El Local 3',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local4.jpeg',      label: 'El Local 4',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local5.jpeg',      label: 'El Local 5',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local6.jpeg',      label: 'El Local 6',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local7.jpeg',      label: 'El Local 7',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
-              { src: '/public/galeria/local8.jpeg',      label: 'El Local 8',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/fotoantigua1.jpeg', label: 'Foto Antigua 1', icon: '🖼️', tag: 'Historia', size: 'large' },
+              { src: '/galeria/fotoantigua2.jpeg', label: 'Foto Antigua 2', icon: '🖼️', tag: 'Historia', size: 'normal' },
+              { src: '/galeria/fotoantigua3.jpeg', label: 'Foto Antigua 3', icon: '🖼️', tag: 'Historia', size: 'normal' },
+              { src: '/galeria/local0.jpeg',   label: 'El Dueño',        icon: '👨‍🍳', tag: 'Equipo', size: 'normal' },
+              { src: '/galeria/local1.jpeg',      label: 'El Local 1',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local2.jpeg',      label: 'El Local 2',      icon: '🏪', tag: 'Instalaciones', size: 'large' },
+              { src: '/galeria/local3.jpeg',      label: 'El Local 3',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local4.jpeg',      label: 'El Local 4',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local5.jpeg',      label: 'El Local 5',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local6.jpeg',      label: 'El Local 6',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local7.jpeg',      label: 'El Local 7',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
+              { src: '/galeria/local8.jpeg',      label: 'El Local 8',      icon: '🏪', tag: 'Instalaciones', size: 'normal' },
             ].map((item, i) => (
               <div key={i} className={`galeria-item ${item.size}`}>
-                <img src={`/public/galeria/${item.src}`} alt={item.label} className="galeria-real-img"
+                {/* ✅ CORREGIDO: src={item.src} que ya incluye /galeria/... */}
+                <img src={item.src} alt={item.label} className="galeria-real-img"
                   onError={(e) => { const img = e.target as HTMLImageElement; img.style.display='none'; const next = img.nextElementSibling as HTMLElement; if(next) next.style.display='flex'; }} />
                 <div className="galeria-placeholder" style={{display:'none'}}>
                   <span className="galeria-icon">{item.icon}</span>
@@ -730,7 +736,6 @@ export default function App() {
               </div>
             ))}
           </div>
-         
         </main>
       )}
 
@@ -792,7 +797,8 @@ export default function App() {
       {/* ── Footer ── */}
       <footer className="footer">
         <div className="footer-content">
-          <img src="/public/galeria/logo.png" alt="Logo" className="footer-logo" />
+          {/* ✅ CORREGIDO: /galeria/logo.png (sin /public/) */}
+          <img src="/galeria/logo.png" alt="Logo" className="footer-logo" />
           <div className="footer-info">
             <p>© 2025 Carnicería Hermanos Gómez · Tres generaciones de tradición</p>
             <p>General Díaz Porlier, 21 · 28001 Madrid · Tel: 91 402 59 92</p>
