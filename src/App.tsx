@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { CartItem, Product, Category, CustomerForm, CartView } from './types'
 import { categories } from './data/categories'
-import { calcItemTotal } from './utils/helpers'
+
 
 import Navbar, { Footer } from './components/Navbar'
 import CartSidebar from './components/CartSidebar'
