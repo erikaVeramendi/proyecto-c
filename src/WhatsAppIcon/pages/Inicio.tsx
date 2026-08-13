@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { StarRating, ReviewsCarousel, WhatsAppIcon } from '../../../src/components/ui/SharedUI'
-import { WHATSAPP_NUMBER, horarioConcurrencia } from '../../data/constants'
+import { horarioConcurrencia } from '../../data/constants'
+import { useStore } from '../../store/useStore'
 
 interface InicioProps {
   onGoToShop: () => void
@@ -8,6 +9,7 @@ interface InicioProps {
 }
 
 export default function Inicio({ onGoToShop, onGoToHistoria }: InicioProps) {
+  const { storeInfo } = useStore();
   const [heroLoaded, setHeroLoaded] = useState(false)
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function Inicio({ onGoToShop, onGoToHistoria }: InicioProps) {
               <span>Ver Nuestros Productos</span>
               <svg viewBox="0 0 20 20" width="16" fill="currentColor"><path d="M10 3l7 7-7 7M3 10h14"/></svg>
             </button>
-            <a className="btn-whatsapp-hero" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer">
+            <a className="btn-whatsapp-hero" href={`https://wa.me/${storeInfo.whatsapp_number}`} target="_blank" rel="noreferrer">
               <WhatsAppIcon width={18} height={18} />
               Contactar por WhatsApp
             </a>

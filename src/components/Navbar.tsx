@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { WhatsAppIcon } from './ui/SharedUI'
-import { WHATSAPP_NUMBER } from '../data/constants'
+import { useStore } from '../store/useStore'
 
 interface NavbarProps {
   activeSection: string
@@ -51,18 +51,20 @@ export default function Navbar({ activeSection, setActiveSection, cartCount, onC
 
 // Footer también va aquí por ser pequeño
 export function Footer() {
+  const { storeInfo } = useStore();
+  
   return (
     <footer className="footer">
       <div className="footer-content">
         <img src="/galeria/logo.png" alt="Logo" className="footer-logo" />
         <div className="footer-info">
-          <p>© 2025 Carnicería Hermanos Gómez · Tres generaciones de tradición</p>
-          <p>General Díaz Porlier, 21 · 28001 Madrid · Tel: 91 402 59 92</p>
+          <p>© 2025 {storeInfo.store_name} · Tres generaciones de tradición</p>
+          <p>{storeInfo.address} · {storeInfo.city_zip}</p>
         </div>
-        <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" className="footer-wa">
+        <a href={`https://wa.me/${storeInfo.whatsapp_number}`} target="_blank" rel="noreferrer" className="footer-wa">
           <WhatsAppIcon width={28} height={28} />
         </a>
       </div>
     </footer>
   )
-}
+}

@@ -1,0 +1,3 @@
+﻿src/admin/ManageProducts.tsx(36,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/main.tsx(4,17): error TS2307: Cannot find module './App.tsx' or its corresponding type declarations.

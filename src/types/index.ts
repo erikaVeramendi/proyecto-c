@@ -15,6 +15,7 @@ export interface Product {
   emoji: string
   description: string
   image?: string      // ruta opcional /productos/xxx.png
+  category_id?: string
 }
 
 export interface Category {
@@ -38,3 +39,8 @@ export interface CustomerForm {
 }
 
 export type CartView = 'cart' | 'form' | 'confirm'
+
+export interface StoreInfo {
+  key: string
+  value: string
+}

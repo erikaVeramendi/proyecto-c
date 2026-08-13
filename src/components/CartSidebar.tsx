@@ -1,6 +1,6 @@
 import type { CartItem, CustomerForm, CartView } from '../types'
 import { calcItemTotal, formatGrams } from '../utils/helpers'
-import { WHATSAPP_NUMBER } from '../data/constants'
+import { useStore } from '../store/useStore'
 import { WhatsAppIcon } from './ui/SharedUI'
 import LocationPicker from './LocationPicker'
 
@@ -23,6 +23,7 @@ export default function CartSidebar({
   customerForm, onFormChange, formSubmitted, onFormSubmit,
   view, setView,
 }: CartSidebarProps) {
+  const { storeInfo } = useStore();
   const total = cart.reduce((s, i) => s + calcItemTotal(i), 0)
 
   const isFormValid = (): boolean => {
@@ -63,7 +64,7 @@ export default function CartSidebar({
     msg += `💰 *TOTAL ESTIMADO:* ${total.toFixed(2)}€\n`
     msg += `_(El precio final se confirmará tras el corte exacto)_`
     if (f.notes) msg += `\n\n📝 *Notas:* ${f.notes}`
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/${storeInfo.whatsapp_number}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   // ── Vista carrito vacío ──
