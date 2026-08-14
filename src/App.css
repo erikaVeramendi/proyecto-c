@@ -144,6 +144,8 @@ strong { font-weight: 700; }
   box-shadow: var(--shadow-lg); animation: modalPop .25s ease;
   border: 2px solid var(--beige-dark);
 }
+.add-modal h2 { color: var(--text); font-family: 'Playfair Display', serif; }
+.add-modal .form-group label { color: var(--red-dark); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; }
 
 .modal-close {
   position: absolute; top: 1rem; right: 1rem; z-index: 5;
@@ -993,7 +995,7 @@ button.dot { width: 10px; height: 10px; border-radius: 50%; border: none; backgr
   border-bottom: 2px solid var(--beige);
 }
 .cat-big-icon { font-size: 2.8rem; }
-.products-category-header h2 { font-size: 1.8rem; }
+.products-category-header h2 { font-size: 1.8rem; color: var(--text); }
 .products-category-header span { font-size: .85rem; color: var(--text-light); }
 
 .products-grid {
@@ -1289,7 +1291,58 @@ button.dot { width: 10px; height: 10px; border-radius: 50%; border: none; backgr
 }
 .wysiwyg-store-btn:hover { opacity: 1; background: var(--charcoal); color: var(--white); }
 
-/* ─── Store Edit Modal ────────────────────────────────────── */
+/* ─── Edit Product Modal ──────────────────────────────────── */
+.edit-product-modal {
+  padding: 0 !important;
+  max-width: 500px;
+}
+
+.edit-product-header {
+  background: var(--charcoal);
+  padding: 1.5rem 2rem;
+  border-bottom: 3px solid var(--red-dark);
+}
+
+.edit-product-header h2 {
+  color: var(--cream) !important;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+}
+
+.edit-product-header p {
+  color: var(--beige-dark);
+  font-size: 0.85rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.edit-product-body {
+  padding: 1.5rem 1.75rem 1.75rem;
+  background: var(--cream);
+  overflow-y: auto;
+  max-height: 65vh;
+}
+
+.edit-product-body .form-group label {
+  color: var(--red-dark) !important;
+}
+
+.edit-product-body .form-group input,
+.edit-product-body .form-group textarea {
+  background: white;
+  color: var(--text);
+  border-color: var(--beige-dark);
+}
+
+.edit-product-body .btn-add-confirm {
+  width: 100%;
+  margin: 1rem 0 0;
+}
+
+
 .store-edit-modal {
   padding: 0 !important;
   max-width: 520px;

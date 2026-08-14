@@ -92,11 +92,13 @@ export default function EditProductModal({ product, category, onClose }: EditPro
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="add-modal" onClick={e => e.stopPropagation()} style={{ padding: '20px' }}>
+      <div className="add-modal edit-product-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} type="button">✕</button>
-        <h2 style={{ marginBottom: '20px', fontFamily: 'Playfair Display, serif' }}>
-          {product ? '✏️ Editar Producto' : '➕ Añadir Producto'}
-        </h2>
+        <div className="edit-product-header">
+          <h2>{product ? '✏️ Editar Producto' : '➕ Añadir Producto'}</h2>
+          <p>{category.name}</p>
+        </div>
+        <div className="edit-product-body">
 
         {errorMsg && (
           <div style={{
@@ -165,6 +167,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             {saving ? '⏳ Guardando...' : uploadingImage ? 'Subiendo imagen...' : (product ? 'Guardar Cambios' : 'Añadir Producto')}
           </button>
         </form>
+        </div>
       </div>
     </div>
   );
