@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { useEffect } from 'react';
 import './Admin.css';
 
 export default function AdminLogin() {
@@ -14,6 +15,11 @@ export default function AdminLogin() {
   
   const { setIsAdmin } = useStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Cerramos sesión por seguridad siempre que se entra a admin
+    supabase.auth.signOut().then(() => setIsAdmin(false));
+  }, [setIsAdmin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

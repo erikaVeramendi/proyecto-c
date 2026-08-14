@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import StoreFront from './StoreFront';
 import AdminLogin from './admin/AdminLogin';
@@ -6,7 +6,7 @@ import { supabase } from './lib/supabaseClient';
 import { useStore } from './store/useStore';
 
 export default function App() {
-  const { fetchData, loading, setIsAdmin, isAdmin } = useStore();
+  const { fetchData, loading, setIsAdmin } = useStore();
 
   useEffect(() => {
     // Fetch store data
@@ -36,7 +36,7 @@ export default function App() {
         {/* Rutas de la tienda cliente */}
         <Route path="/*" element={<StoreFront />} />
 
-        <Route path="/admin/*" element={isAdmin ? <Navigate to="/" /> : <AdminLogin />} />
+        <Route path="/admin/*" element={<AdminLogin />} />
       </Routes>
     </Router>
   );

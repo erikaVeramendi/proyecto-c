@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import type { CartItem, Product, Category, CartView } from '../../types'
-import { categories } from '../../data/categories'
 import { calcItemTotal, formatGrams } from '../../utils/helpers'
 import AddProductModal from '../../components/AddProductModal'
 import CartSidebar from '../../components/CartSidebar'
@@ -38,11 +37,23 @@ export default function Tienda({
   customerForm, onFormChange, formSubmitted, onFormSubmit,
 }: TiendaProps) {
   const shopRef = useRef<HTMLDivElement>(null)
+  
+  const { isAdmin, deleteProduct, categories } = useStore()
+
+  if (!categories || categories.length === 0) {
+    return (
+      <main className="page-tienda">
+        <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+          <h2>No hay datos disponibles</h2>
+          <p>Los datos de la tienda no se han cargado o la base de datos está vacía.</p>
+        </div>
+      </main>
+    )
+  }
+
   const currentCategory = categories.find(c => c.id === activeCategory) || categories[0]
   const totalItems = cart.length
   const totalPrice = cart.reduce((s, i) => s + calcItemTotal(i), 0)
-  
-  const { isAdmin, deleteProduct } = useStore()
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 

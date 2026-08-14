@@ -68,7 +68,7 @@ export const useStore = create<AppState>((set, get) => ({
 
       // Avoid overriding with empty values if DB is completely empty (helps for first load before inserting SQL)
       set({ 
-        categories: categoriesToSet.length > 0 ? categoriesToSet : get().categories,
+        categories: categoriesToSet,
         products, 
         storeInfo: Object.keys(storeInfoData).length > 0 ? storeInfoData : get().storeInfo,
         loading: false 
