@@ -43,9 +43,21 @@ export default function Tienda({
   if (!categories || categories.length === 0) {
     return (
       <main className="page-tienda">
-        <div style={{ padding: '4rem 1rem', textAlign: 'center' }}>
-          <h2>No hay datos disponibles</h2>
-          <p>Los datos de la tienda no se han cargado o la base de datos está vacía.</p>
+        <div style={{ padding: '8rem 1rem', textAlign: 'center', color: '#1a1a1a' }}>
+          <h2 style={{ color: '#8B1A1A', fontSize: '2rem', marginBottom: '1rem' }}>No hay datos disponibles</h2>
+          <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
+            Los datos de la tienda no se han cargado o la base de datos está vacía.
+          </p>
+          {isAdmin ? (
+            <p style={{ marginTop: '2rem', fontWeight: 'bold', color: '#eab308' }}>
+              ↑ Usa el botón "Migrar Datos a DB" en la barra superior.
+            </p>
+          ) : (
+            <div style={{ marginTop: '2rem' }}>
+              <p style={{ marginBottom: '1rem' }}>Si eres el administrador, debes iniciar sesión para cargar los datos.</p>
+              <a href="/admin" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-block' }}>Ir al Panel de Administrador</a>
+            </div>
+          )}
         </div>
       </main>
     )
