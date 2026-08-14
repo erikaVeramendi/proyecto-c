@@ -37,34 +37,40 @@ export default function EditStoreModal({ onClose }: EditStoreModalProps) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="add-modal" onClick={e => e.stopPropagation()} style={{ padding: '25px', maxWidth: '500px' }}>
+      <div className="add-modal store-edit-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} type="button">✕</button>
-        <h2 style={{ marginBottom: '20px' }}>⚙️ Editar Información Terapéutica / Tienda</h2>
+        <div className="store-edit-header">
+          <span className="store-edit-icon">⚙️</span>
+          <h2>Ajustes de la Tienda</h2>
+          <p>Edita los datos de contacto y ubicación de tu negocio.</p>
+        </div>
         
-        <form onSubmit={handleSubmit}>
-          <div className="form-group wysiwyg-form">
-            <label>Nombre de la Tienda</label>
-            <input type="text" value={formData.store_name} onChange={e => setFormData({...formData, store_name: e.target.value})} required />
+        <form onSubmit={handleSubmit} className="store-edit-form">
+          <div className="store-field-group">
+            <label className="store-field-label">Nombre de la Tienda</label>
+            <input className="store-field-input" type="text" value={formData.store_name} onChange={e => setFormData({...formData, store_name: e.target.value})} required />
           </div>
           
-          <div className="form-group wysiwyg-form">
-            <label>Número de WhatsApp (Ej: +34 600...)</label>
-            <input type="text" value={formData.whatsapp_number} onChange={e => setFormData({...formData, whatsapp_number: e.target.value})} required />
+          <div className="store-field-group">
+            <label className="store-field-label">📱 WhatsApp — Formato internacional (ej: +34600123456, +56912345678)</label>
+            <input className="store-field-input" type="text" value={formData.whatsapp_number} onChange={e => setFormData({...formData, whatsapp_number: e.target.value})} placeholder="+34600123456" required />
+            <span className="store-field-hint">Include el prefijo del país sin espacios ni guiones</span>
           </div>
 
-          <div className="form-group wysiwyg-form">
-            <label>Dirección Corta (Ej: C/ Mayor 12)</label>
-            <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} required />
+          <div className="store-field-group">
+            <label className="store-field-label">Dirección (Ej: C/ Mayor 12)</label>
+            <input className="store-field-input" type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} required />
           </div>
 
-          <div className="form-group wysiwyg-form">
-            <label>Ciudad y Código Postal</label>
-            <input type="text" value={formData.city_zip} onChange={e => setFormData({...formData, city_zip: e.target.value})} required />
+          <div className="store-field-group">
+            <label className="store-field-label">Ciudad y Código Postal</label>
+            <input className="store-field-input" type="text" value={formData.city_zip} onChange={e => setFormData({...formData, city_zip: e.target.value})} required />
           </div>
 
-          <div className="form-group wysiwyg-form">
-            <label>URL del mapa incrustado (Google Maps srccode)</label>
+          <div className="store-field-group">
+            <label className="store-field-label">URL del Mapa de Google Maps (iframe src=...)</label>
             <textarea 
+              className="store-field-input"
               rows={3} 
               value={formData.map_embed_url} 
               onChange={e => setFormData({...formData, map_embed_url: e.target.value})}
@@ -73,7 +79,7 @@ export default function EditStoreModal({ onClose }: EditStoreModalProps) {
           </div>
 
           <button type="submit" className="btn-add-confirm" disabled={loading}>
-            {loading ? 'Guardando cambios...' : 'Guardar y Publicar en Vivo'}
+            {loading ? 'Guardando cambios...' : '✓ Guardar y Publicar en Vivo'}
           </button>
         </form>
       </div>
