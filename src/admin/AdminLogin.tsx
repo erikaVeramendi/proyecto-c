@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEffect } from 'react';
 import './Admin.css';
 
@@ -46,11 +46,11 @@ export default function AdminLogin() {
         <div className="login-glow"></div>
         <div className="admin-login-card premium-glass">
           <div className="login-icon-container">
-            <ShieldCheck size={48} className="shield-icon" />
+            <img src="/galeria/logo.png" alt="Carnicería Logo" className="admin-login-logo" />
           </div>
           
-          <h2>Acceso Clasificado</h2>
-          <p className="login-subtitle">Introduce tus credenciales para habilitar el Modo Edición WYSIWYG.</p>
+          <h2>Panel de Administración</h2>
+          <p className="login-subtitle">Introduce tus credenciales para habilitar el Modo Edición WYSIWYG de la tienda.</p>
           
           <form onSubmit={handleLogin} className="premium-form">
             {error && <div className="premium-alert error">{error}</div>}
