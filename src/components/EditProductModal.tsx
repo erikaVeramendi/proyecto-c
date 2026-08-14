@@ -1,19 +1,18 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabaseClient';
 import type { Product, Category } from '../types';
 
 interface EditProductModalProps {
-  product: Product | null; // null = añadir nuevo
-  category: Category;      // categoría activa (se usa como default al crear)
+  product: Product | null;
+  category: Category;
   onClose: () => void;
 }
 
-// Genera un ID único a partir del nombre: "Costilla Fresca de Cerdo" → "costilla-fresca-de-cerdo-1234"
 function generateId(name: string): string {
   const slug = name
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-');
@@ -24,6 +23,8 @@ function generateId(name: string): string {
 export default function EditProductModal({ product, category, onClose }: EditProductModalProps) {
   const { categories, addProduct, updateProduct } = useStore();
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const catRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     name: product?.name || '',
@@ -31,9 +32,21 @@ export default function EditProductModal({ product, category, onClose }: EditPro
     emoji: product?.emoji || '',
     image: product?.image || '',
     description: product?.description || '',
-    // Al editar, usa la categoría del producto. Al crear, usa la categoría activa en pantalla.
     category_id: product?.category_id || category.id
   });
+
+  // Cierra el desplegable al hacer clic fuera
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (catRef.current && !catRef.current.contains(e.target as Node)) {
+        setCatOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selectedCat = categories.find(c => c.id === formData.category_id);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -42,9 +55,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('product_images')
-        .upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from('product_images').upload(fileName, file);
       if (uploadError) throw uploadError;
       const { data } = supabase.storage.from('product_images').getPublicUrl(fileName);
       setFormData(prev => ({ ...prev, image: data.publicUrl }));
@@ -72,20 +83,16 @@ export default function EditProductModal({ product, category, onClose }: EditPro
     }
   };
 
-  const selectStyle: React.CSSProperties = {
-    width: '100%', padding: '10px', borderRadius: '5px',
-    border: '1.5px solid var(--beige-dark)', fontFamily: 'Lato, sans-serif',
-    fontSize: '0.9rem', color: 'var(--text)', background: 'white',
-    appearance: 'auto'
-  };
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="add-modal" onClick={e => e.stopPropagation()} style={{ padding: '20px' }}>
         <button className="modal-close" onClick={onClose} type="button">✕</button>
-        <h2 style={{ marginBottom: '20px' }}>{product ? '✏️ Editar Producto' : '➕ Añadir Producto'}</h2>
+        <h2 style={{ marginBottom: '20px', fontFamily: 'Playfair Display, serif' }}>
+          {product ? '✏️ Editar Producto' : '➕ Añadir Producto'}
+        </h2>
 
         <form onSubmit={handleSubmit}>
+          {/* Nombre */}
           <div className="form-group wysiwyg-form">
             <label>Nombre del Producto</label>
             <input
@@ -96,6 +103,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             />
           </div>
 
+          {/* Precio + Categoría */}
           <div style={{ display: 'flex', gap: '15px' }}>
             <div className="form-group wysiwyg-form" style={{ flex: 1 }}>
               <label>Precio por kg (€)</label>
@@ -106,21 +114,56 @@ export default function EditProductModal({ product, category, onClose }: EditPro
                 required
               />
             </div>
-            <div className="form-group wysiwyg-form" style={{ flex: 1 }}>
+
+            {/* Custom category picker */}
+            <div className="form-group wysiwyg-form" style={{ flex: 1, position: 'relative' }} ref={catRef}>
               <label>Categoría</label>
-              <select
-                value={formData.category_id}
-                onChange={e => setFormData({ ...formData, category_id: e.target.value })}
-                required
-                style={selectStyle}
+              <button
+                type="button"
+                onClick={() => setCatOpen(o => !o)}
+                style={{
+                  width: '100%', padding: '10px 12px', borderRadius: '5px',
+                  border: '1.5px solid var(--beige-dark)', fontFamily: 'Lato, sans-serif',
+                  fontSize: '0.9rem', color: 'var(--text)', background: 'white',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  cursor: 'pointer', textAlign: 'left',
+                }}
               >
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
-                ))}
-              </select>
+                <span>{selectedCat ? `${selectedCat.icon} ${selectedCat.name}` : 'Seleccionar...'}</span>
+                <span style={{ fontSize: '0.7rem' }}>{catOpen ? '▲' : '▼'}</span>
+              </button>
+
+              {catOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000,
+                  background: 'white', border: '1.5px solid var(--beige-dark)',
+                  borderRadius: '5px', marginTop: '4px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  maxHeight: '220px', overflowY: 'auto',
+                }}>
+                  {categories.map(c => (
+                    <div
+                      key={c.id}
+                      onClick={() => { setFormData(f => ({ ...f, category_id: c.id })); setCatOpen(false); }}
+                      style={{
+                        padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem',
+                        fontFamily: 'Lato, sans-serif', color: 'var(--text)',
+                        background: formData.category_id === c.id ? 'var(--beige)' : 'white',
+                        fontWeight: formData.category_id === c.id ? 700 : 400,
+                        borderBottom: '1px solid var(--beige)',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--beige)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = formData.category_id === c.id ? 'var(--beige)' : 'white')}
+                    >
+                      {c.icon} {c.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Descripción */}
           <div className="form-group wysiwyg-form">
             <label>Descripción corta</label>
             <textarea
@@ -130,6 +173,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             />
           </div>
 
+          {/* Imagen */}
           <div className="form-group wysiwyg-form">
             <label>Imagen del Producto</label>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -139,6 +183,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             </div>
           </div>
 
+          {/* Emoji */}
           <div className="form-group wysiwyg-form">
             <label>O un Emoji (si no hay foto)</label>
             <input
