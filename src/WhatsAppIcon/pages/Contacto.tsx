@@ -1,14 +1,26 @@
 import { WhatsAppIcon } from '../../components/ui/SharedUI'
 import { useStore } from '../../store/useStore'
+import { useState } from 'react'
+import EditStoreModal from '../../components/EditStoreModal'
 
 export default function Contacto() {
-  const { storeInfo } = useStore();
+  const { storeInfo, isAdmin } = useStore();
+  const [isEditingStore, setIsEditingStore] = useState(false);
   
   return (
     <main className="page-contacto">
+      {isEditingStore && <EditStoreModal onClose={() => setIsEditingStore(false)} />}
+      
       <div className="contacto-header">
         <span className="section-tag">Estamos aquí</span>
-        <h1>Contacto &amp; Ubicación</h1>
+        <h1>
+          Contacto &amp; Ubicación
+          {isAdmin && (
+            <button className="wysiwyg-store-btn" onClick={() => setIsEditingStore(true)}>
+              ⚙️ Editar Info
+            </button>
+          )}
+        </h1>
       </div>
 
       <div className="contacto-grid">

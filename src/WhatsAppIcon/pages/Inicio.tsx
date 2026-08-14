@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { StarRating, ReviewsCarousel, WhatsAppIcon } from '../../../src/components/ui/SharedUI'
 import { horarioConcurrencia } from '../../data/constants'
 import { useStore } from '../../store/useStore'
+import EditStoreModal from '../../components/EditStoreModal'
 
 interface InicioProps {
   onGoToShop: () => void
@@ -9,8 +10,9 @@ interface InicioProps {
 }
 
 export default function Inicio({ onGoToShop, onGoToHistoria }: InicioProps) {
-  const { storeInfo } = useStore();
+  const { storeInfo, isAdmin } = useStore();
   const [heroLoaded, setHeroLoaded] = useState(false)
+  const [isEditingStore, setIsEditingStore] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setHeroLoaded(true), 100)
@@ -19,6 +21,8 @@ export default function Inicio({ onGoToShop, onGoToHistoria }: InicioProps) {
 
   return (
     <main className="page-inicio">
+      {isEditingStore && <EditStoreModal onClose={() => setIsEditingStore(false)} />}
+
       {/* ── Hero ── */}
       <section className={`hero ${heroLoaded ? 'loaded' : ''}`}>
         <div className="hero-bg" />
@@ -35,6 +39,13 @@ export default function Inicio({ onGoToShop, onGoToHistoria }: InicioProps) {
           ))}
         </div>
         <div className="hero-content">
+          {isAdmin && (
+            <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 20 }}>
+              <button className="wysiwyg-store-btn" onClick={() => setIsEditingStore(true)}>
+                ⚙️ Ajustes Tienda
+              </button>
+            </div>
+          )}
           <div className="hero-logo-stage">
             <div className="hero-logo-glow" />
             <img src="/galeria/logo.png" alt="Carnicería Hermanos Gómez" className="hero-logo" />

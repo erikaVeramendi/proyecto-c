@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { CartItem, Product, Category, CustomerForm, CartView } from './types'
 import { useStore } from './store/useStore'
+import AdminTopBar from './components/AdminTopBar'
 
 import Navbar, { Footer } from './components/Navbar'
 import CartSidebar from './components/CartSidebar'
@@ -83,6 +84,9 @@ export default function StoreFront() {
 
   return (
     <div className="app">
+      {/* ── Barra WYSIWYG Admin ── */}
+      <AdminTopBar />
+
       {/* ── Navbar global ── */}
       <Navbar
         activeSection={activeSection}

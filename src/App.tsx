@@ -1,17 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import StoreFront from './StoreFront';
-import AdminLayout from './admin/AdminLayout';
 import AdminLogin from './admin/AdminLogin';
-import ManageProducts from './admin/ManageProducts';
-import ManageStore from './admin/ManageStore';
-import ManageCategories from './admin/ManageCategories';
 import { supabase } from './lib/supabaseClient';
 import { useStore } from './store/useStore';
 
 export default function App() {
-  const { fetchData, loading } = useStore();
-  const [session, setSession] = useState<any>(null);
+  const { fetchData, loading, setIsAdmin, isAdmin } = useStore();
 
   useEffect(() => {
     // Fetch store data
@@ -19,13 +14,13 @@ export default function App() {
 
     // Check auth session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setIsAdmin(!!session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setIsAdmin(!!session);
     });
 
     return () => subscription.unsubscribe();
@@ -41,15 +36,7 @@ export default function App() {
         {/* Rutas de la tienda cliente */}
         <Route path="/*" element={<StoreFront />} />
 
-        {/* Rutas del panel de administración */}
-        <Route path="/admin/login" element={session ? <Navigate to="/admin" /> : <AdminLogin />} />
-        
-        <Route path="/admin" element={session ? <AdminLayout /> : <Navigate to="/admin/login" />}>
-          <Route index element={<Navigate to="products" />} />
-          <Route path="products" element={<ManageProducts />} />
-          <Route path="categories" element={<ManageCategories />} />
-          <Route path="store" element={<ManageStore />} />
-        </Route>
+        <Route path="/admin/*" element={isAdmin ? <Navigate to="/" /> : <AdminLogin />} />
       </Routes>
     </Router>
   );

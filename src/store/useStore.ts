@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import type { Category, Product } from '../types'
 
 interface AppState {
+  isAdmin: boolean;
+  setIsAdmin: (val: boolean) => void;
   categories: Category[];
   products: Product[];
   storeInfo: Record<string, string>;
@@ -23,6 +25,8 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set, get) => ({
+  isAdmin: false,
+  setIsAdmin: (val) => set({ isAdmin: val }),
   categories: [],
   products: [],
   storeInfo: {

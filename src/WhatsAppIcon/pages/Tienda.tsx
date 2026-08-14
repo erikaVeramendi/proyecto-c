@@ -1,9 +1,11 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { CartItem, Product, Category, CartView } from '../../types'
 import { categories } from '../../data/categories'
 import { calcItemTotal, formatGrams } from '../../utils/helpers'
 import AddProductModal from '../../components/AddProductModal'
 import CartSidebar from '../../components/CartSidebar'
+import EditProductModal from '../../components/EditProductModal'
+import { useStore } from '../../store/useStore'
 import type { CustomerForm } from '../../types'
 
 interface TiendaProps {
@@ -39,6 +41,10 @@ export default function Tienda({
   const currentCategory = categories.find(c => c.id === activeCategory) || categories[0]
   const totalItems = cart.length
   const totalPrice = cart.reduce((s, i) => s + calcItemTotal(i), 0)
+  
+  const { isAdmin, deleteProduct } = useStore()
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
 
   return (
     <main className="page-tienda" ref={shopRef}>
@@ -49,6 +55,15 @@ export default function Tienda({
           category={addingProduct.category}
           onAdd={(grams) => onAddToCart(addingProduct.product, addingProduct.category, grams)}
           onClose={() => setAddingProduct(null)}
+        />
+      )}
+
+      {/* Modal Editar Producto (WYSIWYG Admin) */}
+      {isEditing && (
+        <EditProductModal 
+          product={editingProduct} 
+          category={currentCategory} 
+          onClose={() => { setIsEditing(false); setEditingProduct(null); }} 
         />
       )}
 
@@ -139,9 +154,26 @@ export default function Tienda({
                   >
                     {inCart ? '+ Añadir más' : 'Añadir al pedido'}
                   </button>
+
+                  {isAdmin && (
+                    <div className="wysiwyg-product-actions">
+                      <button className="btn-wysiwyg" onClick={(e) => { e.stopPropagation(); setEditingProduct(product); setIsEditing(true); }}>✏️ Editar</button>
+                      <button className="btn-wysiwyg delete" onClick={(e) => { 
+                        e.stopPropagation(); 
+                        if(window.confirm('¿Borrar definitivamente?')) deleteProduct(product.id); 
+                      }}>🗑️</button>
+                    </div>
+                  )}
                 </div>
               )
             })}
+            
+            {isAdmin && (
+              <div className="wysiwyg-add-card" onClick={() => { setEditingProduct(null); setIsEditing(true); }}>
+                <span className="wysiwyg-add-icon">➕</span>
+                <h3>Añadir Nuevo Producto</h3>
+              </div>
+            )}
           </div>
         </div>
       </div>
