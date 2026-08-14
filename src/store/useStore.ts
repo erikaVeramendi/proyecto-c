@@ -106,10 +106,13 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   updateProduct: async (id, updates) => {
-    const { error } = await supabase.from('products').update(updates).eq('id', id);
-    if (error) throw error;
+    if (Object.keys(updates).length > 0) {
+      const { error } = await supabase.from('products').update(updates).eq('id', id);
+      if (error) throw error;
+    }
     await get().fetchData();
   },
+
 
   deleteProduct: async (id) => {
     const { error } = await supabase.from('products').delete().eq('id', id);

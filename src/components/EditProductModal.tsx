@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabaseClient';
 import type { Product, Category } from '../types';
@@ -21,10 +21,10 @@ function generateId(name: string): string {
 }
 
 export default function EditProductModal({ product, category, onClose }: EditProductModalProps) {
-  const { categories, addProduct, updateProduct } = useStore();
+  const { addProduct, updateProduct } = useStore();
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [catOpen, setCatOpen] = useState(false);
-  const catRef = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const [formData, setFormData] = useState({
     name: product?.name || '',
@@ -34,19 +34,6 @@ export default function EditProductModal({ product, category, onClose }: EditPro
     description: product?.description || '',
     category_id: product?.category_id || category.id
   });
-
-  // Cierra el desplegable al hacer clic fuera
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (catRef.current && !catRef.current.contains(e.target as Node)) {
-        setCatOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const selectedCat = categories.find(c => c.id === formData.category_id);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -69,17 +56,37 @@ export default function EditProductModal({ product, category, onClose }: EditPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    setErrorMsg('');
     try {
       if (product) {
-        await updateProduct(product.id, formData);
+        // Update directo en Supabase para asegurar que funciona
+        const { error } = await supabase
+          .from('products')
+          .update({
+            name: formData.name,
+            price: formData.price,
+            emoji: formData.emoji,
+            image: formData.image,
+            description: formData.description,
+            category_id: formData.category_id,
+          })
+          .eq('id', product.id);
+        
+        if (error) throw error;
+        
+        // Refreshar datos en el store
+        await updateProduct(product.id, {});
       } else {
         const newId = generateId(formData.name);
         await addProduct({ ...formData, id: newId } as Product);
       }
       onClose();
-    } catch (error) {
-      console.error(error);
-      alert('Error guardando producto');
+    } catch (error: any) {
+      console.error('Error guardando:', error);
+      setErrorMsg(`Error: ${error?.message || 'No se pudo guardar'}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -90,6 +97,16 @@ export default function EditProductModal({ product, category, onClose }: EditPro
         <h2 style={{ marginBottom: '20px', fontFamily: 'Playfair Display, serif' }}>
           {product ? '✏️ Editar Producto' : '➕ Añadir Producto'}
         </h2>
+
+        {errorMsg && (
+          <div style={{
+            background: '#ffebee', color: '#c62828', padding: '10px 14px',
+            borderRadius: '5px', marginBottom: '15px', fontSize: '0.85rem',
+            border: '1px solid #ef9a9a'
+          }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* Nombre */}
@@ -103,64 +120,15 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             />
           </div>
 
-          {/* Precio + Categoría */}
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <div className="form-group wysiwyg-form" style={{ flex: 1 }}>
-              <label>Precio por kg (€)</label>
-              <input
-                type="number" step="0.01"
-                value={formData.price}
-                onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                required
-              />
-            </div>
-
-            {/* Custom category picker */}
-            <div className="form-group wysiwyg-form" style={{ flex: 1, position: 'relative' }} ref={catRef}>
-              <label>Categoría</label>
-              <button
-                type="button"
-                onClick={() => setCatOpen(o => !o)}
-                style={{
-                  width: '100%', padding: '10px 12px', borderRadius: '5px',
-                  border: '1.5px solid var(--beige-dark)', fontFamily: 'Lato, sans-serif',
-                  fontSize: '0.9rem', color: 'var(--text)', background: 'white',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  cursor: 'pointer', textAlign: 'left',
-                }}
-              >
-                <span>{selectedCat ? `${selectedCat.icon} ${selectedCat.name}` : 'Seleccionar...'}</span>
-                <span style={{ fontSize: '0.7rem' }}>{catOpen ? '▲' : '▼'}</span>
-              </button>
-
-              {catOpen && (
-                <div style={{
-                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000,
-                  background: 'white', border: '1.5px solid var(--beige-dark)',
-                  borderRadius: '5px', marginTop: '4px',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                  maxHeight: '220px', overflowY: 'auto',
-                }}>
-                  {categories.map(c => (
-                    <div
-                      key={c.id}
-                      onClick={() => { setFormData(f => ({ ...f, category_id: c.id })); setCatOpen(false); }}
-                      style={{
-                        padding: '10px 14px', cursor: 'pointer', fontSize: '0.88rem',
-                        fontFamily: 'Lato, sans-serif', color: 'var(--text)',
-                        background: formData.category_id === c.id ? 'var(--beige)' : 'white',
-                        fontWeight: formData.category_id === c.id ? 700 : 400,
-                        borderBottom: '1px solid var(--beige)',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--beige)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = formData.category_id === c.id ? 'var(--beige)' : 'white')}
-                    >
-                      {c.icon} {c.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          {/* Precio */}
+          <div className="form-group wysiwyg-form">
+            <label>Precio por kg (€)</label>
+            <input
+              type="number" step="0.01"
+              value={formData.price}
+              onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+              required
+            />
           </div>
 
           {/* Descripción */}
@@ -176,7 +144,7 @@ export default function EditProductModal({ product, category, onClose }: EditPro
           {/* Imagen */}
           <div className="form-group wysiwyg-form">
             <label>Imagen del Producto</label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
               {formData.image && <img src={formData.image} alt="prev" style={{ width: 50, height: 50, borderRadius: 4, objectFit: 'cover' }} />}
               <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} />
               {uploadingImage && <span style={{ fontSize: 12 }}>Subiendo...</span>}
@@ -193,8 +161,8 @@ export default function EditProductModal({ product, category, onClose }: EditPro
             />
           </div>
 
-          <button type="submit" className="btn-add-confirm" disabled={uploadingImage}>
-            {uploadingImage ? 'Guardando...' : (product ? 'Guardar Cambios' : 'Añadir Producto')}
+          <button type="submit" className="btn-add-confirm" disabled={uploadingImage || saving}>
+            {saving ? '⏳ Guardando...' : uploadingImage ? 'Subiendo imagen...' : (product ? 'Guardar Cambios' : 'Añadir Producto')}
           </button>
         </form>
       </div>
