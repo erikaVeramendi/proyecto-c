@@ -4,9 +4,21 @@ import { supabase } from '../lib/supabaseClient';
 import type { Product, Category } from '../types';
 
 interface EditProductModalProps {
-  product: Product | null; // null if adding new
-  category: Category;      // default category for new product
+  product: Product | null; // null = añadir nuevo
+  category: Category;      // categoría activa (se usa como default al crear)
   onClose: () => void;
+}
+
+// Genera un ID único a partir del nombre: "Costilla Fresca de Cerdo" → "costilla-fresca-de-cerdo-1234"
+function generateId(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  const suffix = Math.floor(Math.random() * 9000) + 1000;
+  return `${slug}-${suffix}`;
 }
 
 export default function EditProductModal({ product, category, onClose }: EditProductModalProps) {
@@ -14,34 +26,27 @@ export default function EditProductModal({ product, category, onClose }: EditPro
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const [formData, setFormData] = useState({
-    id: product?.id || '',
     name: product?.name || '',
     price: product?.price || 0,
     emoji: product?.emoji || '',
     image: product?.image || '',
     description: product?.description || '',
+    // Al editar, usa la categoría del producto. Al crear, usa la categoría activa en pantalla.
     category_id: product?.category_id || category.id
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    
     setUploadingImage(true);
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
-    
     try {
       const { error: uploadError } = await supabase.storage
         .from('product_images')
         .upload(fileName, file);
-
       if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage
-        .from('product_images')
-        .getPublicUrl(fileName);
-
+      const { data } = supabase.storage.from('product_images').getPublicUrl(fileName);
       setFormData(prev => ({ ...prev, image: data.publicUrl }));
     } catch (error) {
       console.error('Error uploading:', error);
@@ -57,7 +62,8 @@ export default function EditProductModal({ product, category, onClose }: EditPro
       if (product) {
         await updateProduct(product.id, formData);
       } else {
-        await addProduct(formData as Product);
+        const newId = generateId(formData.name);
+        await addProduct({ ...formData, id: newId } as Product);
       }
       onClose();
     } catch (error) {
@@ -66,63 +72,80 @@ export default function EditProductModal({ product, category, onClose }: EditPro
     }
   };
 
+  const selectStyle: React.CSSProperties = {
+    width: '100%', padding: '10px', borderRadius: '5px',
+    border: '1.5px solid var(--beige-dark)', fontFamily: 'Lato, sans-serif',
+    fontSize: '0.9rem', color: 'var(--text)', background: 'white',
+    appearance: 'auto'
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="add-modal" onClick={e => e.stopPropagation()} style={{ padding: '20px' }}>
         <button className="modal-close" onClick={onClose} type="button">✕</button>
         <h2 style={{ marginBottom: '20px' }}>{product ? '✏️ Editar Producto' : '➕ Añadir Producto'}</h2>
-        
+
         <form onSubmit={handleSubmit}>
-          {!product && (
-            <div className="form-group wysiwyg-form">
-              <label>ID (sin espacios ej. costilla-cerdo)</label>
-              <input type="text" value={formData.id} onChange={e => setFormData({...formData, id: e.target.value})} required />
-            </div>
-          )}
-          
           <div className="form-group wysiwyg-form">
             <label>Nombre del Producto</label>
-            <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+            <input
+              type="text"
+              value={formData.name}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
           </div>
 
           <div style={{ display: 'flex', gap: '15px' }}>
             <div className="form-group wysiwyg-form" style={{ flex: 1 }}>
               <label>Precio por kg (€)</label>
-              <input type="number" step="0.01" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} required />
+              <input
+                type="number" step="0.01"
+                value={formData.price}
+                onChange={e => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                required
+              />
             </div>
             <div className="form-group wysiwyg-form" style={{ flex: 1 }}>
               <label>Categoría</label>
-              <select 
-                value={formData.category_id} 
-                onChange={e => setFormData({...formData, category_id: e.target.value})}
+              <select
+                value={formData.category_id}
+                onChange={e => setFormData({ ...formData, category_id: e.target.value })}
                 required
+                style={selectStyle}
               >
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                ))}
               </select>
             </div>
           </div>
 
           <div className="form-group wysiwyg-form">
             <label>Descripción corta</label>
-            <textarea 
-              rows={2} 
-              value={formData.description} 
-              onChange={e => setFormData({...formData, description: e.target.value})}
+            <textarea
+              rows={2}
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
 
           <div className="form-group wysiwyg-form">
             <label>Imagen del Producto</label>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-               {formData.image && <img src={formData.image} alt="prev" style={{width: 50, height: 50, borderRadius: 4, objectFit: 'cover'}} />}
-               <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} />
-               {uploadingImage && <span style={{fontSize: 12}}>Subiendo...</span>}
+              {formData.image && <img src={formData.image} alt="prev" style={{ width: 50, height: 50, borderRadius: 4, objectFit: 'cover' }} />}
+              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} />
+              {uploadingImage && <span style={{ fontSize: 12 }}>Subiendo...</span>}
             </div>
           </div>
 
           <div className="form-group wysiwyg-form">
             <label>O un Emoji (si no hay foto)</label>
-            <input type="text" value={formData.emoji} onChange={e => setFormData({...formData, emoji: e.target.value})} />
+            <input
+              type="text"
+              value={formData.emoji}
+              onChange={e => setFormData({ ...formData, emoji: e.target.value })}
+            />
           </div>
 
           <button type="submit" className="btn-add-confirm" disabled={uploadingImage}>
