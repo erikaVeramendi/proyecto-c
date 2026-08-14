@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import StoreFront from './StoreFront';
 import AdminLogin from './admin/AdminLogin';
 import { supabase } from './lib/supabaseClient';
